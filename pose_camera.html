@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AI Pose Detection</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet@2.2.2/dist/posenet.min.js"></script>
+    <style>
+        body {
+            background-color: #0E1117;
+            color: #FAFAFA;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .video-container {
+            position: relative;
+            flex: 2;
+        }
+        
+        #videoElement {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border-radius: 15px;
+            background: #262730;
+        }
+        
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 15px;
+        }
+        
+        .controls {
+            flex: 1;
+            background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #4F4F4F;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #262730;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #4F4F4F;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #FAFAFA;
+            margin-top: 5px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .exercise-guide {
+            background: #262730;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 1px solid #4F4F4F;
+        }
+        
+        .form-gif {
+            width: 100%;
+            max-width: 200px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .feedback {
+            background: #48bb78;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .feedback.warning {
+            background: #ed8936;
+        }
+        
+        .feedback.error {
+            background: #e53e3e;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #262730;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #48bb78 0%, #38a169 100%);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="video-container">
+            <video id="videoElement" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+        </div>
+        
+        <div class="controls">
+            <h2>🎯 Exercise Controls</h2>
+            
+            <div>
+                <label for="exerciseSelect">Choose Exercise:</label>
+                <select id="exerciseSelect" style="background: #262730; color: #FAFAFA; border: 1px solid #4F4F4F; padding: 8px; border-radius: 5px; width: 100%; margin: 5px 0;">
+                    <option value="pushups">Push-ups</option>
+                    <option value="squats">Squats</option>
+                    <option value="lunges">Lunges</option>
+                    <option value="plank">Plank Hold</option>
+                </select>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <label for="targetReps">Target Reps:</label>
+                <input type="number" id="targetReps" value="10" min="1" max="100" 
+                       style="background: #262730; color: #FAFAFA; border: 1px solid #4F4F4F; padding: 8px; border-radius: 5px; width: 100%; margin: 5px 0;">
+            </div>
+            
+            <div>
+                <button id="startBtn" onclick="startDetection()">▶️ Start Detection</button>
+                <button id="stopBtn" onclick="stopDetection()" disabled>⏹️ Stop</button>
+                <button id="resetBtn" onclick="resetCount()">🔄 Reset</button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="repCount">0</div>
+                    <div class="stat-label">Reps</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="formScore">0%</div>
+                    <div class="stat-label">Form</div>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            
+            <div id="feedback" class="feedback" style="display: none;"></div>
+            
+            <div class="exercise-guide">
+                <h3 id="exerciseTitle">Push-ups Guide</h3>
+                <img id="exerciseGif" class="form-gif" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDIwMCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjMjYyNzMwIiByeD0iMTAiLz4KPHN2ZyB4PSI1MCIgeT0iMzAiIHdpZHRoPSIxMDAiIGhlaWdodD0iOTAiIHZpZXdCb3g9IjAgMCAxMDAgOTAiPgo8IS0tIFB1c2gtdXAgYW5pbWF0aW9uIC0tPgo8ZyBpZD0iYm9keSI+CjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0idHJhbnNsYXRlIiBkdXI9IjJzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgdmFsdWVzPSIwLDA7MiwwOzAsMCIvPgo8bGluZSB4MT0iMjAiIHkxPSI0MCIgeDI9IjgwIiB5Mj0iNDAiIHN0cm9rZT0iIzY2N2VlYSIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIzNSIgcj0iNSIgZmlsbD0iIzY2N2VlYSIvPgo8bGluZSB4MT0iMjAiIHkxPSI0NSIgeDI9IjEwIiB5Mj0iNjAiIHN0cm9rZT0iIzY2N2VlYSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPGxpbmUgeDE9IjIwIiB5MT0iNDUiIHgyPSIzMCIgeTI9IjYwIiBzdHJva2U9IiM2NjdlZWEiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxsaW5lIHgxPSI4MCIgeTE9IjQ1IiB4Mj0iNzAiIHkyPSI2MCIgc3Ryb2tlPSIjNjY3ZWVhIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8bGluZSB4MT0iODAiIHkxPSI0NSIgeDI9IjkwIiB5Mj0iNjAiIHN0cm9rZT0iIzY2N2VlYSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9nPgo8L3N2Zz4KPC9zdmc+Cjx0ZXh0IHg9IjEwMCIgeT0iMTQwIiBmaWxsPSIjRkFGQUZBIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlB1c2gtdXAgRm9ybTwvdGV4dD4KPC9zdmc+" alt="Exercise Form">
+                <div id="exerciseInstructions">
+                    <p><strong>Proper Form:</strong></p>
+                    <ul>
+                        <li>Start in plank position</li>
+                        <li>Lower chest to ground</li>
+                        <li>Push back up</li>
+                        <li>Keep body straight</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let video = document.getElementById('videoElement');
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let net = null;
+        let isDetecting = false;
+        let repCount = 0;
+        let targetReps = 10;
+        let currentExercise = 'pushups';
+        let lastPose = null;
+        let exerciseState = 'ready';
+        let holdStartTime = 0;
+        
+        // Advanced animated exercise guides
+        function createAnimatedExerciseGuide(exerciseType) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 200;
+            canvas.height = 150;
+            const ctx = canvas.getContext('2d');
+            
+            let frame = 0;
+            const animate = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#262730';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw based on exercise type
+                switch(exerciseType) {
+                    case 'pushups':
+                        drawPushupAnimation(ctx, frame);
+                        break;
+                    case 'squats':
+                        drawSquatAnimation(ctx, frame);
+                        break;
+                    case 'lunges':
+                        drawLungeAnimation(ctx, frame);
+                        break;
+                    case 'plank':
+                        drawPlankAnimation(ctx, frame);
+                        break;
+                }
+                
+                frame += 1;
+                requestAnimationFrame(animate);
+            };
+            
+            animate();
+            return canvas.toDataURL();
+        }
+        
+        function drawPushupAnimation(ctx, frame) {
+            const t = (frame % 60) / 60;
+            const pushupCycle = Math.sin(t * Math.PI * 2);
+            const yOffset = pushupCycle * 15;
+            
+            ctx.strokeStyle = '#667eea';
+            ctx.fillStyle = '#667eea';
+            ctx.lineWidth = 4;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(40, 60 + yOffset, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body
+            ctx.beginPath();
+            ctx.moveTo(40, 68 + yOffset);
+            ctx.lineTo(140, 68 + yOffset);
+            ctx.stroke();
+            
+            // Arms
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(40, 68 + yOffset);
+            ctx.lineTo(20, 90 + yOffset * 0.5);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(140, 68 + yOffset);
+            ctx.lineTo(160, 90 + yOffset * 0.5);
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(100, 68 + yOffset);
+            ctx.lineTo(100, 120);
+            ctx.stroke();
+            
+            // Instructions
+            ctx.fillStyle = '#FAFAFA';
+            ctx.font = '12px Arial';
+            ctx.fillText('PUSH-UP FORM', 50, 20);
+            ctx.font = '10px Arial';
+            
+            if (pushupCycle < 0) {
+                ctx.fillStyle = '#48bb78';
+                ctx.fillText('⬇ DOWN POSITION', 50, 140);
+            } else {
+                ctx.fillStyle = '#667eea';
+                ctx.fillText('⬆ UP POSITION', 50, 140);
+            }
+        }
+        
+        function drawSquatAnimation(ctx, frame) {
+            const t = (frame % 80) / 80;
+            const squatCycle = Math.sin(t * Math.PI * 2);
+            const yOffset = -squatCycle * squatCycle * 30;
+            const legSpread = Math.abs(squatCycle) * 20;
+            
+            ctx.strokeStyle = '#667eea';
+            ctx.fillStyle = '#667eea';
+            ctx.lineWidth = 4;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(100, 40 + yOffset, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body
+            ctx.beginPath();
+            ctx.moveTo(100, 48 + yOffset);
+            ctx.lineTo(100, 80 + yOffset);
+            ctx.stroke();
+            
+            // Arms (extended forward during squat)
+            const armExtend = Math.abs(squatCycle) * 30;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(100, 60 + yOffset);
+            ctx.lineTo(70 - armExtend, 60 + yOffset);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(100, 60 + yOffset);
+            ctx.lineTo(130 + armExtend, 60 + yOffset);
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(100, 80 + yOffset);
+            ctx.lineTo(85 - legSpread, 110 + yOffset);
+            ctx.lineTo(85 - legSpread, 130);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(100, 80 + yOffset);
+            ctx.lineTo(115 + legSpread, 110 + yOffset);
+            ctx.lineTo(115 + legSpread, 130);
+            ctx.stroke();
+            
+            // Instructions
+            ctx.fillStyle = '#FAFAFA';
+            ctx.font = '12px Arial';
+            ctx.fillText('SQUAT FORM', 70, 20);
+            ctx.font = '10px Arial';
+            
+            if (yOffset < -15) {
+                ctx.fillStyle = '#48bb78';
+                ctx.fillText('⬇ BOTTOM POSITION', 60, 140);
+            } else {
+                ctx.fillStyle = '#667eea';
+                ctx.fillText('⬆ STANDING', 70, 140);
+            }
+        }
+        
+        function drawLungeAnimation(ctx, frame) {
+            const t = (frame % 100) / 100;
+            const lungeCycle = Math.sin(t * Math.PI * 2);
+            const lungeOffset = lungeCycle * 25;
+            const yOffset = -Math.abs(lungeCycle) * 15;
+            
+            ctx.strokeStyle = '#667eea';
+            ctx.fillStyle = '#667eea';
+            ctx.lineWidth = 4;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(100 + lungeOffset * 0.3, 40 + yOffset, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body
+            ctx.beginPath();
+            ctx.moveTo(100 + lungeOffset * 0.3, 48 + yOffset);
+            ctx.lineTo(100 + lungeOffset * 0.3, 80 + yOffset);
+            ctx.stroke();
+            
+            // Arms
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(100 + lungeOffset * 0.3, 60 + yOffset);
+            ctx.lineTo(80 + lungeOffset * 0.3, 60 + yOffset);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(100 + lungeOffset * 0.3, 60 + yOffset);
+            ctx.lineTo(120 + lungeOffset * 0.3, 60 + yOffset);
+            ctx.stroke();
+            
+            // Legs
+            // Front leg
+            ctx.beginPath();
+            ctx.moveTo(100 + lungeOffset * 0.3, 80 + yOffset);
+            ctx.lineTo(100 + lungeOffset * 0.3 + lungeOffset, 105 + yOffset);
+            ctx.lineTo(100 + lungeOffset * 0.3 + lungeOffset, 130);
+            ctx.stroke();
+            
+            // Back leg
+            ctx.beginPath();
+            ctx.moveTo(100 + lungeOffset * 0.3, 80 + yOffset);
+            ctx.lineTo(100 + lungeOffset * 0.3 - lungeOffset, 105 + yOffset);
+            ctx.lineTo(100 + lungeOffset * 0.3 - lungeOffset, 120);
+            ctx.stroke();
+            
+            // Instructions
+            ctx.fillStyle = '#FAFAFA';
+            ctx.font = '12px Arial';
+            ctx.fillText('LUNGE FORM', 70, 20);
+            ctx.font = '10px Arial';
+            
+            if (Math.abs(lungeOffset) > 15) {
+                ctx.fillStyle = '#48bb78';
+                ctx.fillText('⬇ LUNGE POSITION', 60, 140);
+            } else {
+                ctx.fillStyle = '#667eea';
+                ctx.fillText('⬆ STANDING', 70, 140);
+            }
+        }
+        
+        function drawPlankAnimation(ctx, frame) {
+            const t = (frame % 60) / 60;
+            const breathe = Math.sin(t * Math.PI * 4) * 2;
+            
+            ctx.strokeStyle = '#667eea';
+            ctx.fillStyle = '#667eea';
+            ctx.lineWidth = 4;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(40, 60 + breathe, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body (straight line)
+            ctx.beginPath();
+            ctx.moveTo(40, 68 + breathe);
+            ctx.lineTo(140, 68 + breathe);
+            ctx.stroke();
+            
+            // Arms (supporting)
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(40, 68 + breathe);
+            ctx.lineTo(30, 90);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(140, 68 + breathe);
+            ctx.lineTo(150, 90);
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(90, 68 + breathe);
+            ctx.lineTo(90, 90);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(110, 68 + breathe);
+            ctx.lineTo(110, 90);
+            ctx.stroke();
+            
+            // Alignment guide
+            ctx.strokeStyle = '#48bb78';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(40, 68);
+            ctx.lineTo(140, 68);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Instructions
+            ctx.fillStyle = '#FAFAFA';
+            ctx.font = '12px Arial';
+            ctx.fillText('PLANK FORM', 70, 20);
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#48bb78';
+            ctx.fillText('HOLD STEADY', 70, 140);
+            
+            // Timer
+            const timer = Math.floor((frame % 300) / 10);
+            ctx.fillStyle = '#667eea';
+            ctx.font = '14px Arial';
+            ctx.fillText(`${timer}s`, 160, 50);
+        }
+
+        // Exercise configurations with improved animated guides
+        const exercises = {
+            pushups: {
+                title: 'Push-ups Guide',
+                instructions: [
+                    'Start in plank position',
+                    'Lower chest to ground', 
+                    'Push back up',
+                    'Keep body straight'
+                ],
+                gif: 'animated'  // Will be replaced with canvas animation
+            },
+            squats: {
+                title: 'Squats Guide',
+                instructions: [
+                    'Stand with feet shoulder-width apart',
+                    'Lower hips back and down',
+                    'Keep chest up and knees out',
+                    'Return to standing position'
+                ],
+                gif: 'animated'
+            },
+            lunges: {
+                title: 'Lunges Guide', 
+                instructions: [
+                    'Step forward into lunge position',
+                    'Lower back knee toward ground',
+                    'Keep front knee over ankle',
+                    'Push back to starting position'
+                ],
+                gif: 'animated'
+            },
+            plank: {
+                title: 'Plank Hold Guide',
+                instructions: [
+                    'Hold plank position',
+                    'Keep body in straight line',
+                    'Engage core muscles',
+                    'Breathe steadily'
+                ],
+                gif: 'animated'
+            }
+        };
+
+        // Initialize camera
+        async function setupCamera() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    'audio': false,
+                    'video': {
+                        facingMode: 'user',
+                        width: 640,
+                        height: 480
+                    }
+                });
+                video.srcObject = stream;
+                
+                return new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        resolve(video);
+                    };
+                });
+            } else {
+                throw new Error('Camera not available');
+            }
+        }
+
+        // Load PoseNet model
+        async function loadModel() {
+            net = await posenet.load({
+                architecture: 'MobileNetV1',
+                outputStride: 16,
+                inputResolution: { width: 640, height: 480 },
+                multiplier: 0.75
+            });
+            console.log('PoseNet model loaded');
+        }
+
+        // Start pose detection
+        async function startDetection() {
+            if (!net) {
+                showFeedback('Loading AI model...', 'feedback');
+                await loadModel();
+            }
+            
+            try {
+                await setupCamera();
+                isDetecting = true;
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                currentExercise = document.getElementById('exerciseSelect').value;
+                targetReps = parseInt(document.getElementById('targetReps').value);
+                updateExerciseGuide();
+                showFeedback('Detection started! Position yourself in the camera view.', 'feedback');
+                detectPose();
+            } catch (error) {
+                showFeedback('Camera access denied. Please enable camera permissions.', 'error');
+                console.error('Camera error:', error);
+            }
+        }
+
+        // Stop pose detection
+        function stopDetection() {
+            isDetecting = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            
+            // Stop camera stream
+            if (video.srcObject) {
+                const tracks = video.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            showFeedback('Detection stopped.', 'feedback');
+        }
+
+        // Reset rep count
+        function resetCount() {
+            repCount = 0;
+            exerciseState = 'ready';
+            updateDisplay();
+            showFeedback('Count reset. Ready to start!', 'feedback');
+        }
+
+        // Main pose detection loop
+        async function detectPose() {
+            if (!isDetecting || !net) return;
+
+            const pose = await net.estimateSinglePose(video, {
+                flipHorizontal: false,
+                decodingMethod: 'single-person'
+            });
+
+            // Clear canvas and draw video frame
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.translate(-canvas.width, 0);
+            ctx.restore();
+
+            // Draw pose
+            if (pose.score > 0.3) {
+                drawKeypoints(pose.keypoints);
+                drawSkeleton(pose.keypoints);
+                analyzeExercise(pose);
+            }
+
+            if (isDetecting) {
+                requestAnimationFrame(detectPose);
+            }
+        }
+
+        // Draw pose keypoints
+        function drawKeypoints(keypoints) {
+            keypoints.forEach((keypoint) => {
+                if (keypoint.score > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(keypoint.position.x, keypoint.position.y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#667eea';
+                    ctx.fill();
+                }
+            });
+        }
+
+        // Draw pose skeleton
+        function drawSkeleton(keypoints) {
+            const adjacentKeyPoints = [
+                [5, 6], [5, 7], [6, 8], [7, 9], [8, 10],
+                [5, 11], [6, 12], [11, 12], [11, 13], [12, 14], [13, 15], [14, 16]
+            ];
+
+            adjacentKeyPoints.forEach(([i, j]) => {
+                const kp1 = keypoints[i];
+                const kp2 = keypoints[j];
+                
+                if (kp1.score > 0.5 && kp2.score > 0.5) {
+                    ctx.beginPath();
+                    ctx.moveTo(kp1.position.x, kp1.position.y);
+                    ctx.lineTo(kp2.position.x, kp2.position.y);
+                    ctx.strokeStyle = '#667eea';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+            });
+        }
+
+        // Analyze exercise movement
+        function analyzeExercise(pose) {
+            const keypoints = pose.keypoints;
+            let formScore = 0;
+            
+            switch (currentExercise) {
+                case 'pushups':
+                    formScore = analyzePushups(keypoints);
+                    break;
+                case 'squats':
+                    formScore = analyzeSquats(keypoints);
+                    break;
+                case 'lunges':
+                    formScore = analyzeLunges(keypoints);
+                    break;
+                case 'plank':
+                    formScore = analyzePlank(keypoints);
+                    break;
+            }
+            
+            document.getElementById('formScore').textContent = Math.round(formScore) + '%';
+            updateDisplay();
+        }
+
+        // Enhanced push-up analysis with better accuracy
+        function analyzePushups(keypoints) {
+            const leftElbow = keypoints[7];
+            const rightElbow = keypoints[8];
+            const leftShoulder = keypoints[5];
+            const rightShoulder = keypoints[6];
+            const leftWrist = keypoints[9];
+            const rightWrist = keypoints[10];
+            const nose = keypoints[0];
+            
+            if (leftElbow.score > 0.4 && rightElbow.score > 0.4 && 
+                leftShoulder.score > 0.4 && rightShoulder.score > 0.4) {
+                
+                // Calculate multiple metrics for better detection
+                const avgElbowY = (leftElbow.position.y + rightElbow.position.y) / 2;
+                const avgShoulderY = (leftShoulder.position.y + rightShoulder.position.y) / 2;
+                const shoulderToElbow = avgElbowY - avgShoulderY;
+                
+                // Calculate nose height relative to elbows for body position
+                const noseToElbow = nose.score > 0.4 ? (nose.position.y - avgElbowY) : 0;
+                
+                // Improved state machine for push-up detection
+                if (exerciseState === 'ready' && shoulderToElbow > 30 && noseToElbow > -20) {
+                    exerciseState = 'down';
+                    showFeedback('Down position detected', 'feedback');
+                } else if (exerciseState === 'down' && shoulderToElbow < 15 && noseToElbow < -10) {
+                    exerciseState = 'up';
+                    repCount++;
+                    showFeedback(`Excellent! Rep ${repCount} completed!`, 'feedback');
+                    
+                    if (repCount >= targetReps) {
+                        showFeedback(`🎉 Target reached! ${targetReps} push-ups completed!`, 'feedback');
+                        // Trigger celebration animation
+                        document.body.style.background = 'linear-gradient(45deg, #48bb78, #38a169)';
+                        setTimeout(() => {
+                            document.body.style.background = '#0E1117';
+                        }, 1000);
+                    }
+                    
+                    setTimeout(() => {
+                        exerciseState = 'ready';
+                    }, 800);
+                }
+                
+                // Form scoring based on alignment and range
+                let formScore = 70;
+                if (leftWrist.score > 0.4 && rightWrist.score > 0.4) {
+                    const wristAlignment = Math.abs(leftWrist.position.y - rightWrist.position.y);
+                    formScore += Math.max(0, 15 - wristAlignment);
+                }
+                
+                // Penalty for poor shoulder alignment
+                const shoulderAlignment = Math.abs(leftShoulder.position.y - rightShoulder.position.y);
+                formScore -= Math.min(20, shoulderAlignment);
+                
+                return Math.max(50, Math.min(100, formScore));
+            }
+            return 0;
+        }
+
+        // Enhanced squat analysis with depth and form checking
+        function analyzeSquats(keypoints) {
+            const leftKnee = keypoints[13];
+            const rightKnee = keypoints[14];
+            const leftHip = keypoints[11];
+            const rightHip = keypoints[12];
+            const leftAnkle = keypoints[15];
+            const rightAnkle = keypoints[16];
+            
+            if (leftKnee.score > 0.4 && rightKnee.score > 0.4 && 
+                leftHip.score > 0.4 && rightHip.score > 0.4) {
+                
+                const avgKneeY = (leftKnee.position.y + rightKnee.position.y) / 2;
+                const avgHipY = (leftHip.position.y + rightHip.position.y) / 2;
+                const legBend = avgHipY - avgKneeY;
+                
+                // Calculate squat depth - hips should go below knee level for proper depth
+                const squatDepth = avgHipY - avgKneeY;
+                
+                // Check knee alignment and stance width
+                const kneeWidth = Math.abs(leftKnee.position.x - rightKnee.position.x);
+                const hipWidth = Math.abs(leftHip.position.x - rightHip.position.x);
+                
+                // Enhanced state machine for squat detection
+                if (exerciseState === 'ready' && legBend < -25) {
+                    exerciseState = 'down';
+                    showFeedback('Squat down position detected', 'feedback');
+                } else if (exerciseState === 'down' && legBend > -5) {
+                    exerciseState = 'up';
+                    repCount++;
+                    
+                    // Provide depth feedback
+                    let depthFeedback = '';
+                    if (legBend < -35) {
+                        depthFeedback = ' - Excellent depth!';
+                    } else if (legBend < -25) {
+                        depthFeedback = ' - Good depth!';
+                    } else {
+                        depthFeedback = ' - Try going deeper!';
+                    }
+                    
+                    showFeedback(`Excellent! Rep ${repCount} completed${depthFeedback}`, 'feedback');
+                    
+                    if (repCount >= targetReps) {
+                        showFeedback(`🎉 Target reached! ${targetReps} squats completed!`, 'feedback');
+                        // Celebration effect
+                        document.body.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
+                        setTimeout(() => {
+                            document.body.style.background = '#0E1117';
+                        }, 1000);
+                    }
+                    
+                    setTimeout(() => {
+                        exerciseState = 'ready';
+                    }, 800);
+                }
+                
+                // Enhanced form scoring
+                let formScore = 70;
+                
+                // Reward proper squat depth
+                if (legBend < -35) {
+                    formScore += 20; // Excellent depth
+                } else if (legBend < -25) {
+                    formScore += 15; // Good depth
+                } else if (legBend < -15) {
+                    formScore += 10; // Moderate depth
+                }
+                
+                // Check stance width (knees should track over toes)
+                const stanceRatio = kneeWidth / (hipWidth + 1);
+                if (stanceRatio > 0.9 && stanceRatio < 1.3) {
+                    formScore += 10; // Good stance width
+                }
+                
+                return Math.max(50, Math.min(100, formScore));
+            }
+            return 0;
+        }
+
+        // Enhanced lunge analysis with forward/backward movement detection
+        function analyzeLunges(keypoints) {
+            const leftKnee = keypoints[13];
+            const rightKnee = keypoints[14];
+            const leftHip = keypoints[11];
+            const rightHip = keypoints[12];
+            const leftAnkle = keypoints[15];
+            const rightAnkle = keypoints[16];
+            
+            if (leftKnee.score > 0.4 && rightKnee.score > 0.4 && 
+                leftHip.score > 0.4 && rightHip.score > 0.4) {
+                
+                const kneeDistance = Math.abs(leftKnee.position.x - rightKnee.position.x);
+                const avgHipY = (leftHip.position.y + rightHip.position.y) / 2;
+                const avgKneeY = (leftKnee.position.y + rightKnee.position.y) / 2;
+                const hipToKneeDistance = avgHipY - avgKneeY;
+                
+                // Detect lunge depth and stance
+                const isInLunge = kneeDistance > 80 && hipToKneeDistance < -20;
+                const isStanding = kneeDistance < 60 && hipToKneeDistance > -10;
+                
+                // Enhanced state machine for lunge detection
+                if (exerciseState === 'ready' && isInLunge) {
+                    exerciseState = 'lunge';
+                    showFeedback('Lunge position detected', 'feedback');
+                } else if (exerciseState === 'lunge' && isStanding) {
+                    exerciseState = 'ready';
+                    repCount++;
+                    
+                    // Provide form feedback
+                    let formFeedback = '';
+                    if (kneeDistance > 100) {
+                        formFeedback = ' - Great step length!';
+                    } else if (kneeDistance > 80) {
+                        formFeedback = ' - Good form!';
+                    } else {
+                        formFeedback = ' - Try a longer step!';
+                    }
+                    
+                    showFeedback(`Perfect! Rep ${repCount} completed${formFeedback}`, 'feedback');
+                    
+                    if (repCount >= targetReps) {
+                        showFeedback(`🎉 Target reached! ${targetReps} lunges completed!`, 'feedback');
+                        // Celebration effect
+                        document.body.style.background = 'linear-gradient(45deg, #f093fb, #f5576c)';
+                        setTimeout(() => {
+                            document.body.style.background = '#0E1117';
+                        }, 1000);
+                    }
+                }
+                
+                // Form scoring based on lunge depth and balance
+                let formScore = 75;
+                
+                if (isInLunge) {
+                    // Reward proper lunge stance
+                    if (kneeDistance > 100) {
+                        formScore += 15;
+                    } else if (kneeDistance > 80) {
+                        formScore += 10;
+                    }
+                    
+                    // Check depth
+                    if (hipToKneeDistance < -30) {
+                        formScore += 10; // Good depth
+                    }
+                }
+                
+                // Check balance (both ankles visible and aligned)
+                if (leftAnkle.score > 0.4 && rightAnkle.score > 0.4) {
+                    const ankleStability = Math.abs(leftAnkle.position.y - rightAnkle.position.y);
+                    if (ankleStability < 40) {
+                        formScore += 5; // Good balance
+                    }
+                }
+                
+                return Math.max(60, Math.min(100, formScore));
+            }
+            return 0;
+        }
+
+        // Enhanced plank analysis with body alignment and hold timing
+        function analyzePlank(keypoints) {
+            const leftShoulder = keypoints[5];
+            const rightShoulder = keypoints[6];
+            const leftHip = keypoints[11];
+            const rightHip = keypoints[12];
+            const leftElbow = keypoints[7];
+            const rightElbow = keypoints[8];
+            const nose = keypoints[0];
+            
+            if (leftShoulder.score > 0.4 && rightShoulder.score > 0.4 && 
+                leftHip.score > 0.4 && rightHip.score > 0.4) {
+                
+                const shoulderY = (leftShoulder.position.y + rightShoulder.position.y) / 2;
+                const hipY = (leftHip.position.y + rightHip.position.y) / 2;
+                const bodyAlignment = Math.abs(shoulderY - hipY);
+                
+                // Calculate head position for proper alignment
+                const headAlignment = nose.score > 0.4 ? 
+                    Math.abs(nose.position.y - shoulderY) : 0;
+                
+                // Check if in proper plank position
+                const isInPlank = bodyAlignment < 35 && headAlignment < 35;
+                const isPoorForm = bodyAlignment > 50 || headAlignment > 45;
+                
+                // Enhanced plank state management with timing
+                if (exerciseState === 'ready' && isInPlank) {
+                    exerciseState = 'holding';
+                    holdStartTime = Date.now();
+                    showFeedback('Plank hold started - maintain straight line!', 'feedback');
+                } else if (exerciseState === 'holding') {
+                    const currentHoldTime = Math.floor((Date.now() - holdStartTime) / 1000);
+                    
+                    if (isPoorForm) {
+                        exerciseState = 'ready';
+                        showFeedback(`Plank ended - held for ${currentHoldTime} seconds`, 'feedback');
+                        
+                        // Update plank record if held long enough
+                        if (currentHoldTime > 10) {
+                            repCount++;
+                            showFeedback(`Great hold! ${currentHoldTime}s plank completed!`, 'feedback');
+                            
+                            if (repCount >= targetReps) {
+                                showFeedback(`🎉 Target reached! ${targetReps} plank holds completed!`, 'feedback');
+                                document.body.style.background = 'linear-gradient(45deg, #4facfe, #00f2fe)';
+                                setTimeout(() => {
+                                    document.body.style.background = '#0E1117';
+                                }, 1000);
+                            }
+                        }
+                    } else {
+                        // Provide encouragement during hold
+                        if (currentHoldTime % 10 === 0 && currentHoldTime > 0) {
+                            showFeedback(`${currentHoldTime}s - Excellent hold! Keep it steady.`, 'feedback');
+                        }
+                    }
+                }
+                
+                // Form scoring based on alignment and stability
+                let formScore = 75;
+                
+                // Reward straight body alignment
+                if (bodyAlignment < 15) {
+                    formScore += 20; // Excellent alignment
+                } else if (bodyAlignment < 25) {
+                    formScore += 15; // Very good alignment
+                } else if (bodyAlignment < 35) {
+                    formScore += 10; // Good alignment
+                } else if (bodyAlignment < 45) {
+                    formScore += 5; // Fair alignment
+                } else {
+                    formScore -= 15; // Poor alignment
+                }
+                
+                // Check head position
+                if (headAlignment < 25) {
+                    formScore += 5; // Good head position
+                }
+                
+                return Math.max(50, Math.min(100, formScore));
+            }
+            return 0;
+        }
+
+        // Update exercise guide with animated canvas
+        function updateExerciseGuide() {
+            const exercise = exercises[currentExercise];
+            document.getElementById('exerciseTitle').textContent = exercise.title;
+            
+            // Replace static image with animated canvas
+            const gifContainer = document.getElementById('exerciseGif').parentNode;
+            const existingCanvas = gifContainer.querySelector('canvas');
+            if (existingCanvas) {
+                existingCanvas.remove();
+            }
+            
+            // Create new animated canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = 200;
+            canvas.height = 150;
+            canvas.className = 'form-gif';
+            canvas.style.borderRadius = '10px';
+            canvas.style.border = '2px solid #667eea';
+            
+            const ctx = canvas.getContext('2d');
+            let frame = 0;
+            
+            const animate = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#262730';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw exercise animation
+                switch(currentExercise) {
+                    case 'pushups':
+                        drawPushupAnimation(ctx, frame);
+                        break;
+                    case 'squats':
+                        drawSquatAnimation(ctx, frame);
+                        break;
+                    case 'lunges':
+                        drawLungeAnimation(ctx, frame);
+                        break;
+                    case 'plank':
+                        drawPlankAnimation(ctx, frame);
+                        break;
+                }
+                
+                frame += 1;
+                requestAnimationFrame(animate);
+            };
+            
+            // Insert canvas before the existing gif element
+            document.getElementById('exerciseGif').style.display = 'none';
+            gifContainer.insertBefore(canvas, document.getElementById('exerciseGif'));
+            animate();
+            
+            const instructionsDiv = document.getElementById('exerciseInstructions');
+            instructionsDiv.innerHTML = '<p><strong>Proper Form:</strong></p><ul>' + 
+                exercise.instructions.map(inst => `<li>${inst}</li>`).join('') + '</ul>';
+        }
+
+        // Show feedback message
+        function showFeedback(message, type = 'feedback') {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            feedback.style.display = 'block';
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 3000);
+        }
+
+        // Update display
+        function updateDisplay() {
+            document.getElementById('repCount').textContent = repCount;
+            const progress = Math.min((repCount / targetReps) * 100, 100);
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // Exercise selection change
+        document.getElementById('exerciseSelect').addEventListener('change', function() {
+            currentExercise = this.value;
+            updateExerciseGuide();
+            resetCount();
+        });
+
+        // Target reps change
+        document.getElementById('targetReps').addEventListener('change', function() {
+            targetReps = parseInt(this.value);
+            updateDisplay();
+        });
+
+        // Initialize
+        updateExerciseGuide();
+        updateDisplay();
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+exercise_id,exercise_name,muscle_group,difficulty,equipment,calories_per_minute
+1,Push-ups,Chest,Beginner,None,8
+2,Squats,Legs,Beginner,None,10
+3,Lunges,Legs,Intermediate,None,9
+4,Plank,Core,Beginner,None,5
+5,Burpees,Full Body,Advanced,None,15
+6,Jumping Jacks,Cardio,Beginner,None,8
+7,Mountain Climbers,Cardio,Intermediate,None,12
+8,Sit-ups,Core,Beginner,None,6
+9,Pull-ups,Back,Advanced,Pull-up Bar,10
+10,Deadlifts,Back,Advanced,Barbell,12
+11,Bench Press,Chest,Intermediate,Barbell,10
+12,Shoulder Press,Shoulders,Intermediate,Dumbbells,8
+13,Bicep Curls,Arms,Beginner,Dumbbells,6
+14,Tricep Dips,Arms,Intermediate,None,8
+15,Leg Press,Legs,Intermediate,Machine,9
+16,Chest Flyes,Chest,Intermediate,Dumbbells,7
+17,Lat Pulldowns,Back,Intermediate,Machine,9
+18,Leg Curls,Legs,Intermediate,Machine,7
+19,Calf Raises,Legs,Beginner,None,4
+20,Russian Twists,Core,Intermediate,None,7
+21,High Knees,Cardio,Beginner,None,10
+22,Butt Kicks,Cardio,Beginner,None,9
+23,Jump Squats,Legs,Intermediate,None,12
+24,Push-up to T,Chest,Intermediate,None,9
+25,Superman,Back,Beginner,None,4
+26,Wall Sits,Legs,Beginner,None,6
+27,Side Plank,Core,Intermediate,None,5
+28,Reverse Lunges,Legs,Beginner,None,9
+29,Incline Push-ups,Chest,Beginner,None,6
+30,Glute Bridges,Glutes,Beginner,None,5
+31,Bear Crawls,Full Body,Intermediate,None,11
+32,Frog Jumps,Legs,Intermediate,None,13
+33,Pike Push-ups,Shoulders,Intermediate,None,8
+34,Single-leg Deadlifts,Legs,Advanced,Dumbbells,10
+35,Step-ups,Legs,Intermediate,None,8
+36,Dumbbell Rows,Back,Intermediate,Dumbbells,9
+37,Overhead Squats,Legs,Advanced,Barbell,11
+38,Turkish Get-ups,Full Body,Advanced,Kettlebell,14
+39,Kettlebell Swings,Full Body,Intermediate,Kettlebell,13
+40,Box Jumps,Legs,Advanced,Box,14
+41,Barbell Squats,Legs,Advanced,Barbell,12
+42,Dips,Arms,Intermediate,Dip Bar,9
+43,Hammer Curls,Arms,Intermediate,Dumbbells,6
+44,Cable Flyes,Chest,Intermediate,Cable,8
+45,Leg Extensions,Legs,Intermediate,Machine,7
+46,Face Pulls,Back,Intermediate,Cable,7
+47,Hip Thrusts,Glutes,Intermediate,None,8
+48,Walking Lunges,Legs,Intermediate,None,9
+49,Battle Ropes,Cardio,Advanced,Battle Rope,16
+50,Medicine Ball Slams,Full Body,Advanced,Medicine Ball,14

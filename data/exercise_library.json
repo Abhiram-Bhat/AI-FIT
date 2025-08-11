@@ -1,0 +1,362 @@
+[
+  {
+    "exercise": "Push-ups",
+    "muscle_group": "Chest",
+    "difficulty": "Beginner",
+    "equipment": "None",
+    "calories_per_minute": 8,
+    "instructions": [
+      "Start in a plank position with hands shoulder-width apart",
+      "Lower your body until chest nearly touches the floor",
+      "Push back up to starting position",
+      "Keep your core engaged throughout the movement"
+    ],
+    "benefits": ["Builds chest, shoulders, and triceps", "Improves core stability", "No equipment needed"],
+    "modifications": {
+      "easier": "Knee push-ups or incline push-ups",
+      "harder": "Diamond push-ups or one-arm push-ups"
+    }
+  },
+  {
+    "exercise": "Squats",
+    "muscle_group": "Legs",
+    "difficulty": "Beginner",
+    "equipment": "None",
+    "calories_per_minute": 10,
+    "instructions": [
+      "Stand with feet shoulder-width apart",
+      "Lower your body as if sitting back into a chair",
+      "Keep your chest up and knees behind toes",
+      "Return to standing position"
+    ],
+    "benefits": ["Strengthens quads, glutes, and hamstrings", "Improves functional movement", "Burns calories effectively"],
+    "modifications": {
+      "easier": "Chair-assisted squats",
+      "harder": "Jump squats or pistol squats"
+    }
+  },
+  {
+    "exercise": "Lunges",
+    "muscle_group": "Legs",
+    "difficulty": "Intermediate",
+    "equipment": "None",
+    "calories_per_minute": 9,
+    "instructions": [
+      "Step forward with one leg",
+      "Lower your hips until both knees are bent at 90 degrees",
+      "Keep your front knee over your ankle",
+      "Push back to starting position"
+    ],
+    "benefits": ["Targets legs and glutes", "Improves balance and coordination", "Unilateral strength development"],
+    "modifications": {
+      "easier": "Stationary lunges with support",
+      "harder": "Jumping lunges or weighted lunges"
+    }
+  },
+  {
+    "exercise": "Plank",
+    "muscle_group": "Core",
+    "difficulty": "Beginner",
+    "equipment": "None",
+    "calories_per_minute": 5,
+    "instructions": [
+      "Start in a push-up position",
+      "Hold your body in a straight line",
+      "Keep your core engaged",
+      "Breathe normally while holding"
+    ],
+    "benefits": ["Strengthens entire core", "Improves posture", "Builds endurance"],
+    "modifications": {
+      "easier": "Knee plank or incline plank",
+      "harder": "Single-arm or single-leg plank"
+    }
+  },
+  {
+    "exercise": "Burpees",
+    "muscle_group": "Full Body",
+    "difficulty": "Advanced",
+    "equipment": "None",
+    "calories_per_minute": 15,
+    "instructions": [
+      "Start standing, then squat down",
+      "Place hands on floor and jump feet back to plank",
+      "Do a push-up, then jump feet back to squat",
+      "Explode up with arms overhead"
+    ],
+    "benefits": ["Full-body workout", "High calorie burn", "Improves cardiovascular fitness"],
+    "modifications": {
+      "easier": "Step back instead of jumping",
+      "harder": "Add a tuck jump at the top"
+    }
+  },
+  {
+    "exercise": "Jumping Jacks",
+    "muscle_group": "Cardio",
+    "difficulty": "Beginner",
+    "equipment": "None",
+    "calories_per_minute": 8,
+    "instructions": [
+      "Start with feet together, arms at sides",
+      "Jump feet apart while raising arms overhead",
+      "Jump back to starting position",
+      "Maintain a steady rhythm"
+    ],
+    "benefits": ["Cardiovascular workout", "Full-body movement", "Easy to modify intensity"],
+    "modifications": {
+      "easier": "Step-touch with arm movements",
+      "harder": "Star jumps or speed variations"
+    }
+  },
+  {
+    "exercise": "Mountain Climbers",
+    "muscle_group": "Cardio",
+    "difficulty": "Intermediate",
+    "equipment": "None",
+    "calories_per_minute": 12,
+    "instructions": [
+      "Start in plank position",
+      "Alternate bringing knees to chest rapidly",
+      "Keep hips level and core engaged",
+      "Maintain steady breathing"
+    ],
+    "benefits": ["Cardio and strength combination", "Core strengthening", "Improves agility"],
+    "modifications": {
+      "easier": "Slow controlled movements",
+      "harder": "Cross-body mountain climbers"
+    }
+  },
+  {
+    "exercise": "Sit-ups",
+    "muscle_group": "Core",
+    "difficulty": "Beginner",
+    "equipment": "None",
+    "calories_per_minute": 6,
+    "instructions": [
+      "Lie on back with knees bent",
+      "Place hands behind head or across chest",
+      "Lift shoulders off ground toward knees",
+      "Lower back down with control"
+    ],
+    "benefits": ["Strengthens abdominal muscles", "Improves core endurance", "Simple movement pattern"],
+    "modifications": {
+      "easier": "Crunches instead of full sit-ups",
+      "harder": "Weighted sit-ups or bicycle crunches"
+    }
+  },
+  {
+    "exercise": "Pull-ups",
+    "muscle_group": "Back",
+    "difficulty": "Advanced",
+    "equipment": "Pull-up Bar",
+    "calories_per_minute": 10,
+    "instructions": [
+      "Hang from bar with palms facing away",
+      "Pull body up until chin clears the bar",
+      "Lower with control to full extension",
+      "Keep core engaged throughout"
+    ],
+    "benefits": ["Builds upper body strength", "Targets lats and biceps", "Functional pulling movement"],
+    "modifications": {
+      "easier": "Assisted pull-ups or negative reps",
+      "harder": "Weighted pull-ups or muscle-ups"
+    }
+  },
+  {
+    "exercise": "Deadlifts",
+    "muscle_group": "Back",
+    "difficulty": "Advanced",
+    "equipment": "Barbell",
+    "calories_per_minute": 12,
+    "instructions": [
+      "Stand with feet hip-width apart",
+      "Grip barbell with hands just outside legs",
+      "Keep back straight and lift by driving hips forward",
+      "Lower bar with control maintaining form"
+    ],
+    "benefits": ["Builds posterior chain strength", "Improves posture", "High calorie burn"],
+    "modifications": {
+      "easier": "Romanian deadlifts or dumbbell deadlifts",
+      "harder": "Sumo deadlifts or deficit deadlifts"
+    }
+  },
+  {
+    "exercise": "High Knees",
+    "muscle_group": "Cardio",
+    "difficulty": "Beginner",
+    "equipment": "None",
+    "calories_per_minute": 10,
+    "instructions": [
+      "Stand tall with feet hip-width apart",
+      "Run in place lifting knees to hip level",
+      "Pump arms naturally",
+      "Maintain quick turnover"
+    ],
+    "benefits": ["Improves cardiovascular fitness", "Enhances coordination", "Builds leg strength"],
+    "modifications": {
+      "easier": "Marching in place",
+      "harder": "Add speed or duration"
+    }
+  },
+  {
+    "exercise": "Russian Twists",
+    "muscle_group": "Core",
+    "difficulty": "Intermediate",
+    "equipment": "None",
+    "calories_per_minute": 7,
+    "instructions": [
+      "Sit with knees bent, feet slightly off ground",
+      "Lean back to engage core",
+      "Rotate torso left and right",
+      "Keep chest up and core tight"
+    ],
+    "benefits": ["Targets obliques", "Improves rotational strength", "Enhances core stability"],
+    "modifications": {
+      "easier": "Keep feet on ground",
+      "harder": "Hold weight or medicine ball"
+    }
+  },
+  {
+    "exercise": "Wall Sits",
+    "muscle_group": "Legs",
+    "difficulty": "Beginner",
+    "equipment": "None",
+    "calories_per_minute": 6,
+    "instructions": [
+      "Stand with back against wall",
+      "Slide down until thighs are parallel to floor",
+      "Keep knees at 90 degrees",
+      "Hold position for specified time"
+    ],
+    "benefits": ["Builds leg endurance", "Strengthens quads and glutes", "Isometric strengthening"],
+    "modifications": {
+      "easier": "Higher position or shorter duration",
+      "harder": "Single-leg wall sits"
+    }
+  },
+  {
+    "exercise": "Tricep Dips",
+    "muscle_group": "Arms",
+    "difficulty": "Intermediate",
+    "equipment": "None",
+    "calories_per_minute": 8,
+    "instructions": [
+      "Sit on edge of chair or bench",
+      "Place hands next to hips, fingers forward",
+      "Lower body by bending elbows",
+      "Push back up to starting position"
+    ],
+    "benefits": ["Targets triceps effectively", "Builds pushing strength", "Uses body weight"],
+    "modifications": {
+      "easier": "Bend knees or use higher surface",
+      "harder": "Straight legs or add weight"
+    }
+  },
+  {
+    "exercise": "Jump Squats",
+    "muscle_group": "Legs",
+    "difficulty": "Intermediate",
+    "equipment": "None",
+    "calories_per_minute": 12,
+    "instructions": [
+      "Perform a regular squat",
+      "Explode up into a jump",
+      "Land softly back into squat position",
+      "Maintain control throughout movement"
+    ],
+    "benefits": ["Builds explosive power", "High calorie burn", "Improves athletic performance"],
+    "modifications": {
+      "easier": "Smaller jumps or regular squats",
+      "harder": "Higher jumps or weighted vest"
+    }
+  },
+  {
+    "exercise": "Side Plank",
+    "muscle_group": "Core",
+    "difficulty": "Intermediate",
+    "equipment": "None",
+    "calories_per_minute": 5,
+    "instructions": [
+      "Lie on side with forearm on ground",
+      "Lift hips to create straight line",
+      "Keep core engaged and hips up",
+      "Hold position breathing normally"
+    ],
+    "benefits": ["Targets obliques and deep core", "Improves lateral stability", "Corrects imbalances"],
+    "modifications": {
+      "easier": "Modified with knees down",
+      "harder": "Top leg raised or arm movements"
+    }
+  },
+  {
+    "exercise": "Glute Bridges",
+    "muscle_group": "Glutes",
+    "difficulty": "Beginner",
+    "equipment": "None",
+    "calories_per_minute": 5,
+    "instructions": [
+      "Lie on back with knees bent",
+      "Feet flat on floor hip-width apart",
+      "Lift hips by squeezing glutes",
+      "Hold briefly then lower with control"
+    ],
+    "benefits": ["Activates glutes", "Improves hip mobility", "Counteracts sitting posture"],
+    "modifications": {
+      "easier": "Smaller range of motion",
+      "harder": "Single-leg or weighted bridges"
+    }
+  },
+  {
+    "exercise": "Bear Crawls",
+    "muscle_group": "Full Body",
+    "difficulty": "Intermediate",
+    "equipment": "None",
+    "calories_per_minute": 11,
+    "instructions": [
+      "Start on hands and feet, knees hovering",
+      "Move forward by stepping opposite hand and foot",
+      "Keep core tight and back flat",
+      "Maintain low position throughout"
+    ],
+    "benefits": ["Full-body coordination", "Core stability", "Functional movement pattern"],
+    "modifications": {
+      "easier": "Slower movement or higher hips",
+      "harder": "Faster pace or longer distances"
+    }
+  },
+  {
+    "exercise": "Pike Push-ups",
+    "muscle_group": "Shoulders",
+    "difficulty": "Intermediate",
+    "equipment": "None",
+    "calories_per_minute": 8,
+    "instructions": [
+      "Start in downward dog position",
+      "Walk feet closer to hands",
+      "Lower head toward ground",
+      "Push back up to starting position"
+    ],
+    "benefits": ["Targets shoulders and upper chest", "Progression toward handstand push-ups", "Builds overhead strength"],
+    "modifications": {
+      "easier": "Feet further from hands",
+      "harder": "Feet elevated or deeper range"
+    }
+  },
+  {
+    "exercise": "Butt Kicks",
+    "muscle_group": "Cardio",
+    "difficulty": "Beginner",
+    "equipment": "None",
+    "calories_per_minute": 9,
+    "instructions": [
+      "Stand tall and jog in place",
+      "Kick heels toward glutes",
+      "Keep thighs pointing down",
+      "Maintain quick rhythm"
+    ],
+    "benefits": ["Improves hamstring flexibility", "Cardiovascular workout", "Dynamic warm-up exercise"],
+    "modifications": {
+      "easier": "Slower pace",
+      "harder": "Higher kicks or faster pace"
+    }
+  }
+]
