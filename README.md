@@ -251,6 +251,4 @@ For issues, questions, or feature requests:
 - Mobile app development
 - Integration with fitness wearables
 
----
-
-**Built with ❤️ using Streamlit, TensorFlow.js, and modern web technologies**
+  Built by -Abhiram T A-
