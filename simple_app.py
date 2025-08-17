@@ -12,7 +12,7 @@ import streamlit.components.v1 as components
 # Page configuration
 st.set_page_config(
     page_title="AI Fitness Coach",
-    page_icon="💪",
+    page_icon="�",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -475,7 +475,8 @@ def render_pose_detector():
     """, unsafe_allow_html=True)
     
     # Load the HTML camera component
-    with open('pose_camera.html', 'r') as f:
+    # FIX: Adding encoding='utf-8' to prevent UnicodeDecodeError
+    with open('pose_camera.html', 'r', encoding='utf-8') as f:
         camera_html = f.read()
     
     # Embed the full HTML camera component
@@ -611,15 +612,15 @@ def render_profile():
         
         st.subheader("Fitness Goals")
         goal = st.selectbox("Primary Goal", 
-                           ["Weight Loss", "Muscle Gain", "Endurance", "Strength", "General Fitness"],
-                           index=0 if 'goal' not in st.session_state.user_profile else
-                           ["Weight Loss", "Muscle Gain", "Endurance", "Strength", "General Fitness"].index(
-                               st.session_state.user_profile.get('goal', 'General Fitness')))
+                            ["Weight Loss", "Muscle Gain", "Endurance", "Strength", "General Fitness"],
+                            index=0 if 'goal' not in st.session_state.user_profile else
+                            ["Weight Loss", "Muscle Gain", "Endurance", "Strength", "General Fitness"].index(
+                                st.session_state.user_profile.get('goal', 'General Fitness')))
     
     with col2:
         st.subheader("Workout Preferences")
         workout_duration = st.slider("Preferred workout duration (minutes)", 
-                                    15, 120, st.session_state.user_profile.get('workout_duration', 45))
+                                     15, 120, st.session_state.user_profile.get('workout_duration', 45))
         
         workout_frequency = st.slider("Workouts per week", 
                                      1, 7, st.session_state.user_profile.get('workout_frequency', 3))
