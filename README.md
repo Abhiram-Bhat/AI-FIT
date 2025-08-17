@@ -230,10 +230,6 @@ streamlit run simple_app.py --server.port 5000
 4. Test thoroughly
 5. Submit a pull request
 
-## 📄 License
-
-This project is open source and available under the MIT License.
-
 ## 🆘 Support
 
 For issues, questions, or feature requests:
@@ -251,6 +247,4 @@ For issues, questions, or feature requests:
 - Mobile app development
 - Integration with fitness wearables
 
----
-
-**Built with ❤️ using Streamlit, TensorFlow.js, and modern web technologies**
+  Built by -Abhiram T A-
