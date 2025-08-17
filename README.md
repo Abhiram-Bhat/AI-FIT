@@ -246,5 +246,8 @@ For issues, questions, or feature requests:
 - Advanced analytics and insights
 - Mobile app development
 - Integration with fitness wearables
+<<<<<<< Updated upstream
 
   Built by -Abhiram T A-
+=======
+>>>>>>> Stashed changes
